@@ -17,3 +17,10 @@ export interface Challenge {
 
     requiredObject?: string // e.g. a specific color or object
 }
+
+export type ChallengeContextType = {
+    challenges: Challenge[]
+    load: () => Promise<void>
+    addChallenge: (challenge: Challenge) => void
+    completeChallenge: (id: string) => void
+}
