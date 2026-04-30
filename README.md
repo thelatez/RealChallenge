@@ -1,37 +1,32 @@
 # RealChallenge
 A "real-life challenge" mobile app created with Expo and React Native.
 
-Sovellus tarjoaa käyttäjälle päivittäisiä “real-life” -haasteita, jotka suoritetaan fyysisessä ympäristössä. Haasteet voivat liittyä esimerkiksi liikkumiseen, ympäristön havainnointiin tai yksinkertaisiin tehtäviin (esim. tietyn matkan kulkeminen, tietyn tyyppisen kohteen valokuvaaminen tai uuden paikan vieraileminen).
+The application provides users daily "real-life" challenges, that are completed in a real environment. Challenges can be about moving, observing surroundings or simple tasks (e.g. moving a certain distance, taking a picture of a specific thing or color, or visiting a new place).
 
-Käyttäjä voi:
+User can:
+- Receive and look through challenges
+- Complete challenges using device features (location, camera)
+- Get automatic checking for challenge progress (e.g. from location)
+- Save completed challenges and follow progress
 
-vastaanottaa ja selata haasteita
-suorittaa haasteita hyödyntämällä laitteen ominaisuuksia (sijainti, kamera)
-saada automaattisen tarkistuksen haasteen suorittamisesta (esim. sijaintiin perustuen)
-tallentaa suoritetut haasteet ja seurata omaa edistymistään
+The application includes many views (e.g. challenges, active challenge, history) and uses different components and logic in challenge generation and validation.
 
-Sovellus sisältää useita näkymiä (esim. haasteet, aktiivinen haaste, historia) ja hyödyntää eriytettyjä komponentteja sekä sovelluslogiikkaa haasteiden generointiin ja validointiin.
+Used technologies:
+- React Native + Expo
+- Expo Router (navigation between views)
+- TypeScript
 
-Käytetyt teknologiat
-React Native + Expo
-Expo Router (navigointi näkymien välillä)
-TypeScript (tyypitetty sovelluslogiikka)
+Expo SDK -features:
+- expo-location (location based challenges)
+- expo-camera (camera based challenges)
+- expo-notifications (daily challenges / reminders)
 
-Expo SDK -ominaisuudet:
-
-expo-location (sijaintiin perustuvat haasteet)
-expo-camera (kuvaan perustuvat haasteet)
-expo-notifications (päivittäiset haasteet / muistutukset)
-
-Datan hallinta:
-
-AsyncStorage (paikallinen tallennus haasteille ja edistymiselle)
+Data management:
+- AsyncStorage (local storage for challenges and progress)
 
 UI:
+- react-native-paper (UI components)
 
-react-native-paper (käyttöliittymäkomponentit)
-
-Sovellusarkkitehtuuri:
-
-Custom React hookit (esim. haasteiden hallinta ja logiikka)
-Context API (globaalin tilan hallinta, esim. käyttäjän edistyminen)
+Program architecture:
+- Custom React hookit (e.g. challenge management and logic)
+- Context API (global state management, e.g. challenge progress)
