@@ -23,7 +23,6 @@ export default function ChallengeDetail() {
     const [distanceTraveled, setDistanceTraveled] = useState(0)
 
     useEffect(() => {
-        // Only navigate back if we're done loading and challenge still doesn't exist
         if (!isLoading && !challenge && challenges.length > 0) {
             router.back()
         }
@@ -92,13 +91,14 @@ export default function ChallengeDetail() {
     }
 
     const getTimeRemaining = () => {
+        if (challenge.status === "completed") return "Completed"
         const now = Date.now()
         const remaining = challenge.deadline - now
-        if (remaining < 0) return "0m"
+        if (remaining < 0) return "Expired"
         const minutes = Math.ceil(remaining / 60000)
         const hours = Math.floor(minutes / 60)
-        if (hours > 0) return `${hours}h`
-        return `${minutes}m`
+        if (hours > 0) return `${hours}h left`
+        return `${minutes}m left`
     }
 
     return (
@@ -118,7 +118,7 @@ export default function ChallengeDetail() {
                             }}
                             textStyle={{ color: "#fff" }}
                         >
-                            {getTimeRemaining()} left
+                            {getTimeRemaining()}
                         </Chip>
                     </View>
 
@@ -139,7 +139,7 @@ export default function ChallengeDetail() {
                                 <Button
                                     mode="contained"
                                     onPress={handleStartTracking}
-                                    disabled={challenge.status === "completed" || isValidating}
+                                    disabled={challenge.status !== "ongoing" || isValidating}
                                     style={styles.button}
                                 >
                                     Start Tracking
@@ -147,7 +147,7 @@ export default function ChallengeDetail() {
                                 <Button
                                     mode="outlined"
                                     onPress={handleUpdateDistance}
-                                    disabled={challenge.status === "completed" || isValidating}
+                                    disabled={challenge.status !== "ongoing" || isValidating}
                                     style={styles.button}
                                 >
                                     Update Location
@@ -155,7 +155,7 @@ export default function ChallengeDetail() {
                                 <Button
                                     mode="contained"
                                     onPress={handleMovementSubmit}
-                                    disabled={isValidating || challenge.status === "completed"}
+                                    disabled={challenge.status !== "ongoing" || isValidating}
                                     loading={isValidating}
                                     style={styles.button}
                                 >
@@ -176,6 +176,7 @@ export default function ChallengeDetail() {
                                 <Button
                                     mode="contained"
                                     onPress={() => console.log("Open camera")} // TODO: integrate camera
+                                    disabled={challenge.status !== "ongoing"}
                                     style={styles.button}
                                 >
                                     Take Photo
@@ -184,7 +185,7 @@ export default function ChallengeDetail() {
                                     <Button
                                         mode="contained"
                                         onPress={() => handlePhotoSubmit(challenge.photoUri!)}
-                                        disabled={isValidating || challenge.status === "completed"}
+                                        disabled={challenge.status !== "ongoing" || isValidating}
                                         loading={isValidating}
                                         style={styles.button}
                                     >
