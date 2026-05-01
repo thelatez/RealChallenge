@@ -98,6 +98,12 @@ export default function Index() {
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
               <Text variant="displaySmall" style={styles.statNumber}>
+                {challenges.filter(c => c.status === "ongoing").length}
+              </Text>
+              <Text variant="labelMedium">Active</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text variant="displaySmall" style={styles.statNumber}>
                 {stats.completedTotal}
               </Text>
               <Text variant="labelMedium">Completed</Text>
@@ -107,12 +113,6 @@ export default function Index() {
                 {stats.expiredToday}
               </Text>
               <Text variant="labelMedium">Expired</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text variant="displaySmall" style={styles.statNumber}>
-                {challenges.filter(c => c.status === "ongoing").length}
-              </Text>
-              <Text variant="labelMedium">Active</Text>
             </View>
           </View>
         </View>
