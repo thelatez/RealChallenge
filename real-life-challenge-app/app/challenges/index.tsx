@@ -29,7 +29,7 @@ export default function ChallengesIndex() {
                 <View style={{ marginTop: 12 }}>
                     <SegmentedButtons
                         value={filter}
-                        onValueChange={(value: any) => setFilter(value)}
+                        onValueChange={(value: "all" | "active" | "completed") => setFilter(value)}
                         buttons={[
                             { value: "all", label: "All" },
                             { value: "active", label: "Active" },
