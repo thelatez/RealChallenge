@@ -28,5 +28,5 @@ UI:
 - react-native-paper (UI components)
 
 Program architecture:
-- Custom React hookit (e.g. challenge management and logic)
+- Custom React hooks (e.g. challenge management and logic)
 - Context API (global state management, e.g. challenge progress)
