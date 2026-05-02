@@ -4,19 +4,32 @@ import { View, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Card, Text, Button, Chip } from "react-native-paper";
 import { useEffect, useState } from "react";
 import DebugMenu from "@/components/DebugMenu";
+import { generateChallenge } from "@/services/challengeGenerator";
 
 export default function Index() {
-  const { challenges } = useChallengeContext()
+  const { challenges, addChallenge, isLoading } = useChallengeContext()
   const router = useRouter()
   const [debugVisible, setDebugVisible] = useState(false)
 
   useEffect(() => {
-    // Load challenges on mount
-    // const load = async () => {
-    //   await loadChallenges()
-    // }
-    // load()
-  }, [])
+    if (isLoading) return
+
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const todayEnd = new Date()
+    todayEnd.setHours(23, 59, 59, 999)
+
+    const hasTodayChallenge = challenges.some(c =>
+      c.deadline >= todayStart.getTime() &&
+      c.deadline <= todayEnd.getTime() &&
+      (c.status === "ongoing" || c.status === "completed")
+    )
+
+    if (!hasTodayChallenge) {
+      const newChallenge = generateChallenge(challenges)
+      addChallenge(newChallenge)
+    }
+  }, [isLoading, challenges, addChallenge])
 
   // Get today's challenge (first ongoing challenge)
   const todayChallenge = challenges.find(c => c.status === "ongoing")
@@ -53,7 +66,7 @@ export default function Index() {
           <Card style={styles.todayCard}>
             <Card.Content>
               <View style={styles.todayHeader}>
-                <Text variant="titleMedium">Today's Challenge</Text>
+                <Text variant="titleMedium">Today&apos;s Challenge</Text>
                 <Chip style={styles.badge}>Active</Chip>
               </View>
               <Text variant="headlineSmall" style={styles.challengeTitle}>
@@ -86,7 +99,7 @@ export default function Index() {
             <Card.Content style={styles.emptyState}>
               <Text variant="bodyLarge">No challenges today!</Text>
               <Text variant="bodySmall" style={styles.emptyStateText}>
-                You've completed everything or haven't received new challenges yet.
+                You&apos;ve completed everything!
               </Text>
             </Card.Content>
           </Card>
@@ -199,7 +212,7 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
   },
   statCard: {
     flex: 1,
