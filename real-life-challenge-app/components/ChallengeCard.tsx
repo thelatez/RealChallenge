@@ -6,6 +6,14 @@ interface ChallengeCardProps {
     challenge: Challenge;
 }
 
+function formatDeadlineDate(timestamp: number) {
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 export default function ChallengeCard({ challenge }: ChallengeCardProps) {
     const getStatusColor = () => {
         switch (challenge.status) {
@@ -37,6 +45,9 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
                         <Text variant="titleMedium">{challenge.title}</Text>
                         <Text variant="bodySmall" style={{ color: '#666', marginTop: 4 }}>
                             {challenge.description}
+                        </Text>
+                        <Text variant="bodySmall" style={{ color: '#999', marginTop: 6 }}>
+                            Due {formatDeadlineDate(challenge.deadline)}
                         </Text>
                     </View>
                     <Chip 
