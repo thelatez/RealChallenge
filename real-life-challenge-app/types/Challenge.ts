@@ -15,7 +15,9 @@ export interface Challenge {
 
     requiredObject?: string // e.g. a specific color or object
     distanceMeters?: number
+    requiredColor?: string
     photoUri?: string // for photo challenges
+    photoBase64?: string // base64 encoded photo for validation
 }
 
 export type ChallengeContextType = {
