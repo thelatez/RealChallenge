@@ -1,5 +1,5 @@
 import { View, ScrollView, StyleSheet, Modal, Pressable } from "react-native";
-import { Button, Text, Dialog, Portal, Divider, Card } from "react-native-paper";
+import { Button, Text, Dialog, Portal, Card, IconButton, SegmentedButtons, TextInput } from "react-native-paper";
 import { useState } from "react";
 import { generateChallenge } from "@/services/challengeGenerator";
 import { useChallengeContext } from "@/context/ChallengeContext";
@@ -13,11 +13,61 @@ interface DebugMenuProps {
 export default function DebugMenu({ visible, onClose }: DebugMenuProps) {
     const { challenges, addChallenge, completeChallenge, removeChallenge } = useChallengeContext();
     const [clearConfirm, setClearConfirm] = useState(false);
+    const [customType, setCustomType] = useState<"photo" | "movement">("photo");
+    const [customDistance, setCustomDistance] = useState("500");
+    const [customTarget, setCustomTarget] = useState("tree");
+    const [customPhotoType, setCustomPhotoType] = useState<"object" | "color">("object");
+    const [customError, setCustomError] = useState("");
 
     const handleGenerateChallenge = () => {
         const newChallenge = generateChallenge(challenges);
         addChallenge(newChallenge);
     };
+
+    const createDeadline = () => {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        return today.getTime();
+    };
+
+    const handleCreateCustomChallenge = () => {
+        const distance = Number(customDistance);
+        if (customType === "movement") {
+            if (!distance || distance <= 0) {
+                setCustomError("Enter a positive distance");
+                return;
+            }
+        } else if (!customTarget.trim()) {
+            setCustomError("Enter a photo target");
+            return;
+        }
+
+        setCustomError("");
+        const title = customType === "photo"
+            ? `Take a photo`
+            : `Go for a walk`;
+        const description = customType === "photo"
+            ? customPhotoType === "object"
+                ? `Take a photo of a ${customTarget.trim()}`
+                : `Take a photo of something ${customTarget.trim()}`
+            : `Walk ${distance} meters`;
+
+        const newChallenge = {
+            id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+            templateId: `debug_custom_${customType}_${Date.now()}`,
+            type: customType,
+            title,
+            description,
+            status: "ongoing" as const,
+            deadline: createDeadline(),
+            distanceMeters: customType === "movement" ? distance : undefined,
+            requiredObject: customType === "photo" && customPhotoType === "object" ? customTarget.trim() : undefined,
+            requiredColor: customType === "photo" && customPhotoType === "color" ? customTarget.trim() : undefined,
+        };
+
+        addChallenge(newChallenge);
+    };
+
 
     const handleCompleteRandom = () => {
         const ongoing = challenges.find(c => c.status === "ongoing");
@@ -45,7 +95,7 @@ export default function DebugMenu({ visible, onClose }: DebugMenuProps) {
     const handleSimulateWrongValidation = () => {
         const ongoing = challenges.find(c => c.status === "ongoing");
         if (ongoing) {
-            // Just log it - the actual validation will show in the detail screen
+            // Simulate wrong validation by showing a failure message
             console.log("Simulating wrong validation for:", ongoing.title);
         }
     };
@@ -71,16 +121,23 @@ export default function DebugMenu({ visible, onClose }: DebugMenuProps) {
                 animationType="slide"
                 onRequestClose={onClose}
             >
-                <View style={styles.overlay}>
-                    <View style={styles.container}>
+                <Pressable style={styles.overlay} onPress={onClose}>
+                    <Pressable style={styles.container} onPress={() => {}}>
                         <View style={styles.header}>
-                            <Text variant="headlineSmall">🧪 Debug Menu</Text>
+                            <View style={styles.headerRow}>
+                                <Text variant="headlineSmall">🧪 Debug Menu</Text>
+                                <IconButton
+                                    icon="close"
+                                    size={24}
+                                    onPress={onClose}
+                                />
+                            </View>
                             <Text variant="bodySmall" style={styles.subtitle}>
                                 Temporary testing tools
                             </Text>
                         </View>
 
-                        <ScrollView style={styles.content}>
+                        <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
                             {/* CHALLENGE GENERATION */}
                             <Card style={styles.section}>
                                 <Card.Content>
@@ -93,6 +150,63 @@ export default function DebugMenu({ visible, onClose }: DebugMenuProps) {
                                         style={styles.button}
                                     >
                                         ➕ Generate Random Challenge
+                                    </Button>
+                                </Card.Content>
+                            </Card>
+
+                            <Card style={styles.section}>
+                                <Card.Content>
+                                    <Text variant="labelLarge" style={styles.sectionTitle}>
+                                        Custom Challenge
+                                    </Text>
+                                    <Text variant="bodySmall" style={styles.helperText}>
+                                        Create a test challenge with your own type and target.
+                                    </Text>
+                                    <SegmentedButtons
+                                        value={customType}
+                                        onValueChange={(value: "photo" | "movement") => setCustomType(value)}
+                                        buttons={[
+                                            { value: "photo", label: "Photo" },
+                                            { value: "movement", label: "Movement" },
+                                        ]}
+                                        style={styles.segmented}
+                                    />
+                                    {customType === "movement" ? (
+                                        <TextInput
+                                            label="Distance (meters)"
+                                            value={customDistance}
+                                            onChangeText={setCustomDistance}
+                                            keyboardType="numeric"
+                                            style={styles.textInput}
+                                        />
+                                    ) : (
+                                        <>
+                                            <SegmentedButtons
+                                                value={customPhotoType}
+                                                onValueChange={(value: "object" | "color") => setCustomPhotoType(value)}
+                                                buttons={[
+                                                    { value: "object", label: "Object" },
+                                                    { value: "color", label: "Color" },
+                                                ]}
+                                                style={styles.segmented}
+                                            />
+                                            <TextInput
+                                                label={customPhotoType === "object" ? "Photo object" : "Photo color"}
+                                                value={customTarget}
+                                                onChangeText={setCustomTarget}
+                                                style={styles.textInput}
+                                            />
+                                        </>
+                                    )}
+                                    {customError ? (
+                                        <Text variant="bodySmall" style={styles.errorText}>{customError}</Text>
+                                    ) : null}
+                                    <Button
+                                        mode="contained"
+                                        onPress={handleCreateCustomChallenge}
+                                        style={styles.button}
+                                    >
+                                        🛠️ Create Specific Challenge
                                     </Button>
                                 </Card.Content>
                             </Card>
@@ -191,8 +305,8 @@ export default function DebugMenu({ visible, onClose }: DebugMenuProps) {
                                 Close
                             </Button>
                         </View>
-                    </View>
-                </View>
+                    </Pressable>
+                </Pressable>
             </Modal>
 
             {/* CLEAR CONFIRMATION DIALOG */}
@@ -235,6 +349,11 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 16,
     },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     subtitle: {
         marginTop: 4,
         color: "#999",
@@ -253,6 +372,21 @@ const styles = StyleSheet.create({
     sectionTitle: {
         marginBottom: 12,
         fontWeight: "600",
+    },
+    helperText: {
+        marginBottom: 12,
+        color: "#666",
+    },
+    segmented: {
+        marginBottom: 12,
+    },
+    textInput: {
+        marginBottom: 12,
+        backgroundColor: "#fff",
+    },
+    errorText: {
+        color: "#B00020",
+        marginBottom: 8,
     },
     button: {
         marginVertical: 4,
