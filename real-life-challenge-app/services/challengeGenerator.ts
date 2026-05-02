@@ -1,4 +1,5 @@
 import type { Challenge, ChallengeTemplate } from "@/types/Challenge";
+import { randomUUID } from 'expo-crypto';
 
 export function generateChallenge(recentChallenges: Challenge[]): Challenge {
     let available = filterRecentTemplates(recentChallenges, templates);
@@ -17,7 +18,7 @@ export function generateChallenge(recentChallenges: Challenge[]): Challenge {
     const deadline = today.getTime()
 
     return {
-        id: crypto.randomUUID(),
+        id: randomUUID(),
         templateId: template.templateId,
         type: template.type,
         title: template.title,
@@ -58,6 +59,23 @@ const templates: ChallengeTemplate[] = [
             return {
                 requiredObject: selected,
                 description: `Take a photo of a ${selected}`,
+            };
+        },
+    },
+    {
+        templateId: "take_photo_color",
+        type: "photo",
+        title: "Take a photo",
+        description: "Capture a color!",
+        generate: () => {
+            const colors = ["blue", "red", "green", "yellow", "purple"];
+
+            const selected =
+                colors[Math.floor(Math.random() * colors.length)];
+
+            return {
+                requiredColor: selected,
+                description: `Take a photo of something ${selected}.`,
             };
         },
     },
